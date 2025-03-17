@@ -1,0 +1,18 @@
+-- connect to sql
+gcloud sql connect cloud-sql-demo --user=root
+
+--Sql Command
+show databases;
+
+create database customer;
+
+create table customer.customer_purchase_history
+(
+user_id INT,
+age INT,
+annual_income Float,
+purchase_amount float,
+loyalty_score float,
+region  varchar(50),
+frequency int
+);

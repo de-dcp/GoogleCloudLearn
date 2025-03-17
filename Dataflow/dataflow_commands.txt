@@ -1,0 +1,25 @@
+########### Video 1 - Batch Data Processing #################
+
+This is Python Script. Not any Cloud Command // use Python Script Dataflow/dataflow_batch_demo.py inplace of bulekdeal_aggr
+
+python3 -m bulkdeal_aggr \                ---> python program / pipeline
+--input <input csv bucket path> \         ---> Input CSV File location
+--output <output file bucket path> \      --->
+--project <project name> \                --->
+--region <region> \                       ---> Dataflow worker will be spinup in this region
+--staging_location <staging bucket> \     --->
+--temp_location <temp location> \         --->
+--runner DataflowRunner                   ---> Same script can be run on local. Mention DirectRunner
+
+
+########### Video 2 - Stream Data Processing #################
+
+python3 -m <your script name> \
+--input_topic projects/<your bucket>/topics/<your topic> \    --> Input PUBSUB Topic
+--output_path gs://<your bucket>/output \
+--project <your project> \
+--region us-west1 \
+--temp_location gs://<your bucket>/temp \
+--window_size=2 \
+--num_shards=2 \
+--runner DataflowRunner

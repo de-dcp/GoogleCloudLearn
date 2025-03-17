@@ -1,0 +1,44 @@
+[
+    {
+        "name": "user_id",
+        "type": "INTEGER",
+        "mode": "NULLABLE",
+        "description": "unique_customer_id"
+    },
+    {
+        "name": "age",
+        "type": "INTEGER",
+        "mode": "NULLABLE",
+        "description": "CustomerAge"
+    },
+    {
+        "name": "annual_income",
+        "type": "FLOAT",
+        "mode": "NULLABLE",
+        "description": "Customer's Annual Income"
+    },
+    {
+        "name": "purchase_amount",
+        "type": "FLOAT",
+        "mode": "NULLABLE",
+        "description": "Billing Amount"
+    },
+    {
+        "name": "loyalty_score",
+        "type": "FLOAT",
+        "mode": "NULLABLE",
+        "description": "Customer Loyalty Score"
+    },
+    {
+        "name": "region",
+        "type": "STRING",
+        "mode": "NULLABLE",
+        "description": "India Zone"
+    },
+    {
+        "name": "purchase_frequency",
+        "type": "INTEGER",
+        "mode": "NULLABLE",
+        "description": "Customer purchase frequency in Days"
+    }
+]

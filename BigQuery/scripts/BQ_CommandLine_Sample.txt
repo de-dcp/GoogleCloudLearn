@@ -1,0 +1,53 @@
+"""
+1. Create DataSet
+4. Create External Table
+5. run query from command line and pass argument
+6. Restoring Historical Data using Time Travel
+7. Creating snapshot table
+"""
+
+gcloud config set project YOUR_PROJECT_ID
+
+---1.)  Create DataSet CommandLine:
+bq mk --location=asia-south2 --default_table_expiration 432000 --dataset melodic-bearing-430314-d2:dataset_usingg_cli
+
+---2.) Create Table from CommandLine
+bq mk --schema user_id:INTEGER,age:INTEGER,annual_income:FLOAT,purchase_amount:FLOAT,loyalty_score:FLOAT,region:STRING,purchase_frequency:INTEGER -t e-centaur-453713-b5:dataset_usingg_cli.customer_purchase_behavior_cli_2
+
+---3.) Load data in a table from CommandLine
+bq load --source_format=CSV --skip_leading_rows=1 dataset_usingg_cli.customer_purchase_behavior_cli_2 Customer_Purchasing_Behaviors.csv
+
+bq load --source_format=CSV --skip_leading_rows=1 dataset_usingg_cli.customer_purchase_behavior_cli_2 "gs://bq_input_bucket_my_first_project/Customer_Purchasing_Behaviors.csv"
+
+
+Sample Query:
+SELECT region, age, sum(purchase_amount) as total_order_amount
+FROM `e-centaur-453713-b5.dataset_usingg_cli.customer_purchase_behavior_cli_2`
+group by region, age;
+
+
+---4.) Create external table to read data from GoogleDrive or Google Cloud Storage using CommandLine
+
+ bq mk --external_table_definition=gs://test-project-dcp/Customer_Purchasing_Behaviors.csv lexical-cider-440507-u0:test_dcp.extenal_table_Cli_csv
+
+---5.) run query from command line and pass argument
+
+a.) Named Parameter
+bq query --use_legacy_sql=false --parameter=income:Float:30000.00 'SELECT age,average_income,average_loyalty_score FROM lexical-cider-440507-u0.my_dataset_api.customer_age_group_info where average_income=@income'
+
+b.) Positional Parameter
+bq query --use_legacy_sql=false --parameter=:Float:30000.00 'SELECT age,average_income,average_loyalty_score FROM lexical-cider-440507-u0.my_dataset_api.customer_age_group_info where average_income=@income'
+
+
+---6.) Restoring Historical Data using Time Travel
+
+bq cp sales_dataset.sales_data_intl_stg@1732862814359 sales_dataset.sales_data_intl_stg_restored
+
+bq cp sales_dataset.sales_data_intl_stg@-3600000 sales_dataset.sales_data_intl_stg_restored_2
+
+
+---7.) creating snapshot table
+
+bq cp --snapshot --no_clobber --expiration=84000 sales_dataset.sales_data_intl_stg sales_data_view.sales_data_intl_stg_snapshot_2
+
+create snapshot table `e-centaur-453713-b5.dataset_usingg_cli.region_age_data_snapshot_16Mar` clone `e-centaur-453713-b5.dataset_usingg_cli.region_age_data` options (expiration_timestamp = Timestamp('2025-03-31 00:00:00-07:00'))

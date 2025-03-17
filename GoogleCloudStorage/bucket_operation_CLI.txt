@@ -1,0 +1,5 @@
+# Create Bucket
+
+gcloud storage buckets create gs://sales_data_project --default-storage-class=standard --location=us-east1
+
+gcloud storage buckets create gs://sales_data_project_archive --default-storage-class=coldline --location=us-east1 --soft-delete-duration=1w

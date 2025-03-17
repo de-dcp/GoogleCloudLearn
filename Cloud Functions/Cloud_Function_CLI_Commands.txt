@@ -1,0 +1,11 @@
+Cloud Function CLI Command:
+
+gcloud functions deploy python-cli-http-function \
+--gen2 \
+--runtime=python310 \
+--region=us-central1 \
+--source=./cloud_fucntion_src_cd/ \
+--entry-point=hello_http \
+--trigger-http \
+--allow-unauthenticated
+
