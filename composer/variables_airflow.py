@@ -4,9 +4,10 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.utils.dates import days_ago
 from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import PythonOperator
+from airflow.models import Variable
 
 def print_hello():
-    print({{ var.value.get('support_email') }})
+    print( Variable.get("support_email") )
     print('Hey I am Python operator')
 
 # Define the DAG

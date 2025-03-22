@@ -5,6 +5,9 @@ from airflow import DAG
 from airflow.operators.dummy import DummyOperator
 from airflow.contrib.operators.bigquery_operator import BigQueryOperator
 from airflow.contrib.operators.gcs_to_bq import GoogleCloudStorageToBigQueryOperator
+from airflow.contrib.sensors.gcs_sensor  import GoogleCloudStorageObjectSensor
+# from airflow.operators.python import BranchPythonOperator
+# from airflow.utils.trigger_rule import TriggerRule
 
 # Custom Python logic for derriving data value
 yesterday = datetime.combine(datetime.today() - timedelta(1), datetime.min.time())
@@ -31,12 +34,24 @@ with DAG(dag_id='GCS_to_BQ_and_AGG',
         dag=dag,
     )
 
+#Sensor to check file in GCP Bucket
+    check_file = GoogleCloudStorageObjectSensor(
+        task_id='check_file',
+        bucket='sales_data_staging_dcp',
+        object='input_sales_data/customer_purchasing_behaviors.csv',
+        mode='poke',
+        poke_interval=60,
+        timeout=120,
+        soft_fail=True,
+        dag=dag
+    )
+
 # GCS to BigQuery data load Operator and task
     gcs_to_bq_load = GoogleCloudStorageToBigQueryOperator(
                 task_id='gcs_to_bq_load',
-                bucket='bq_input_bucket_my_first_project',
-                source_objects=['Customer Purchasing Behaviors.csv'],
-                destination_project_dataset_table='melodic-bearing-430314-d2.dataset_using_ui.gcs_to_bq_table',
+                bucket='sales_data_staging_dcp',
+                source_objects=['input_sales_data/customer_purchasing_behaviors.csv'],
+                destination_project_dataset_table='e-centaur-453713-b5.sales_data_analysis.gcs_to_bq_table',
                 schema_fields=[
     {"name": "user_id","type": "INTEGER","mode": "NULLABLE","description": "unique_customer_id"},
     {"name": "age","type": "INTEGER","mode": "NULLABLE","description": "CustomerAge"},
@@ -56,12 +71,12 @@ with DAG(dag_id='GCS_to_BQ_and_AGG',
     task_id='create_aggr_bq_table',
     use_legacy_sql=False,
     allow_large_results=True,
-    sql="CREATE OR REPLACE TABLE dataset_using_ui.bq_table_aggr AS \
+    sql="CREATE OR REPLACE TABLE e-centaur-453713-b5.sales_data_analysis.bq_table_aggr AS \
          SELECT \
                 region,\
                 age,\
                 SUM(purchase_amount) as sum_data_value\
-         FROM melodic-bearing-430314-d2.dataset_using_ui.gcs_to_bq_table \
+         FROM e-centaur-453713-b5.sales_data_analysis.gcs_to_bq_table \
          GROUP BY \
                 region,\
                 age",
@@ -74,4 +89,4 @@ with DAG(dag_id='GCS_to_BQ_and_AGG',
     )
 
 # Settting up task  dependency
-start >> gcs_to_bq_load >> create_aggr_bq_table >> end
+start >> check_file >> gcs_to_bq_load >> create_aggr_bq_table >> end
